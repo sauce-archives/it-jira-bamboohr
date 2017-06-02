@@ -1,0 +1,4 @@
+AC-Flask-HipChat==0.2.12
+atlassian-jwt==1.6
+invoke==0.17.0
+PyBambooHR==0.7.1

@@ -1,0 +1,11 @@
+<script type="text/javascript" src="{{ xdm_e }}/atlassian-connect/all.js"></script>
+<style>th { text-align: left; }</style>
+<table>
+    <tr> <th>Division</th> <td>{{ employee['division'] }}</td> </tr>
+    <tr> <th>Department</th> <td>{{ employee['department'] }}</td> </tr>
+    <tr> <th>Display Name</th> <td>{{ employee['displayName'] }}</td> </tr>
+    <tr> <th>Mobile Phone</th> <td><a href="tel:{{ employee['mobilePhone'] | stripalpha }}">{{ employee['mobilePhone'] }}</a></td> </tr>
+    <tr> <th>Work Phone</th> <td><a href="tel:{{ employee['workPhone'] | stripalpha }}">{{ employee['workPhone'] }}</a></td> </tr>
+    <tr> <th>Location</th> <td>{{ employee['location'] }}</td> </tr>
+    <tr> <th>Job Title</th> <td>{{ employee['jobTitle'] }}</td> </tr>
+</table>
