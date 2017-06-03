@@ -74,6 +74,8 @@ def webpanel(key, name, location, **kwargs):
         "url": path + '?issueKey={issue.key}',
         "location": location
     }
+    if kwargs.get('conditions'):
+        webpanel_capability['conditions'] = kwargs.pop('conditions')
 
     descriptor.setdefault(
         'modules', {}
@@ -97,10 +99,9 @@ auth = SimpleAuthenticator()
 
 @app.route('/', methods=['GET'])
 def redirect_to_descriptor():
-    return redirect('/descriptor')
+    return redirect('/addon/descriptor')
 
 
-@app.route('/descriptor', methods=['GET'])
 @app.route('/addon/descriptor', methods=['GET'])
 def get_descriptor():
     return jsonify(descriptor)
@@ -116,7 +117,11 @@ def installed():
 
 @webpanel(key="userPanel",
           name="Bamboo Employee Information",
-          location="atl.jira.view.issue.right.context")
+          location="atl.jira.view.issue.right.context",
+          conditions=[{
+              "condition": "project_type",
+              "params": {"projectTypeKey": "service_desk"}
+          }])
 def right_context():
     client_key = auth.authenticate(request.method, request.url,
                                    request.headers)
@@ -133,6 +138,11 @@ def right_context():
 
     employee = next((e for e in bamboo.get_employee_directory()
                      if e['workEmail'] == email), None)
+    if not employee:
+        return '', 404
+
+    employee.update(bamboo.get_employee(int(employee['id'])))
+
     return render_template(
         'bamboo_user.html',
         xdm_e=request.args.get('xdm_e'),
