@@ -3,6 +3,7 @@ import os
 import atlassian_jwt
 import requests
 import cPickle as pickle
+import jwt as jwt
 from PyBambooHR import PyBambooHR
 from flask import Flask, request, jsonify, redirect, render_template
 
@@ -110,6 +111,30 @@ def get_descriptor():
 @lifecycle('installed')
 def installed():
     client = request.get_json()
+    response = requests.get(
+        client['baseUrl'].rstrip('/') + '/plugins/servlet/oauth/consumer-info')
+    response.raise_for_status()
+
+    key = re.search(r"<key>(.*)</key>", response.text).groups()[0]
+    publicKey = re.search(
+        r"<publicKey>(.*)</publicKey>", response.text
+    ).groups()[0]
+
+    if key != client['clientKey'] or publicKey != client['publicKey']:
+        raise Exception("Invalid Credentials")
+
+    if clients.get(client['clientKey']):
+        token = request.headers.get('authorization', '').replace(r'^JWT ', '')
+        if not token:
+            # Is not first install, but did not sign the request properly for
+            # an update
+            return '', 401
+        try:
+            jwt.decode(token, clients[client['clientKey']]['sharedSecret'])
+        except jwt.exceptions.DecodeError:
+            # Invalid secret, so things did not get installed
+            return '', 401
+
     clients[client['clientKey']] = client
     save_clients()
     return '', 204
