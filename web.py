@@ -6,13 +6,9 @@ import cPickle as pickle
 import jwt as jwt
 from PyBambooHR import PyBambooHR
 from flask import Flask, request, jsonify, redirect, render_template
+from ac_flask import ACAddon
 
-ADDON_KEY = "it-confluence-bamboohr"
 clients = {}
-bamboo = PyBambooHR(
-    subdomain=os.environ['BAMBOOHR_SUBDOMAIN'],
-    api_key=os.environ['BAMBOOHR_API_KEY']
-)
 
 
 def save_clients():
@@ -30,65 +26,15 @@ def load_clients():
         pass
 
 
+ADDON_KEY = "it-confluence-bamboohr"
+bamboo = PyBambooHR(
+    subdomain=os.environ['BAMBOOHR_SUBDOMAIN'],
+    api_key=os.environ['BAMBOOHR_API_KEY']
+)
+
 app = Flask(__name__)
-descriptor = {
-    "name": "Add bamboohr information to tickets",
-    "description": "Add bamboohr information to tickets",
-    "key": ADDON_KEY,
-    "authentication": {"type": "jwt"},
-    "baseUrl": "https://dev.gavinmogan.com",
-    "scopes": ["READ"],
-    "vendor": {
-        "name": "Sauce Labs",
-        "url": "https://saucelabs.com"
-    },
-    "lifecycle": {
-        "installed": "/lifecycle/installed",
-        "enabled": "/ping",
-    },
-}
+ac = ACAddon(app, key=ADDON_KEY)
 load_clients()
-
-
-def lifecycle(name, path=None):
-    if path is None:
-        path = "/lifecycle/" + name
-
-    descriptor.setdefault('lifecycle', {})[name] = path
-
-    def inner(func):
-        return app.route(path, methods=['POST'])(func)
-
-    return inner
-
-
-def webpanel(key, name, location, **kwargs):
-
-    if not re.search(r"^[a-zA-Z0-9-]+$", key):
-        raise Exception("Webpanel(%s) must match ^[a-zA-Z0-9-]+$" % key)
-
-    path = "/webpanel/" + key
-
-    webpanel_capability = {
-        "key": key,
-        "name": {"value": name},
-        "url": path + '?issueKey={issue.key}',
-        "location": location
-    }
-    if kwargs.get('conditions'):
-        webpanel_capability['conditions'] = kwargs.pop('conditions')
-
-    descriptor.setdefault(
-        'modules', {}
-    ).setdefault(
-        'webPanels', []
-    ).append(webpanel_capability)
-
-    def inner(func):
-        return app.route(rule=path, **kwargs)(func)
-
-    return inner
-
 
 class SimpleAuthenticator(atlassian_jwt.Authenticator):
     def get_shared_secret(self, client_key):
@@ -98,17 +44,7 @@ class SimpleAuthenticator(atlassian_jwt.Authenticator):
 auth = SimpleAuthenticator()
 
 
-@app.route('/', methods=['GET'])
-def redirect_to_descriptor():
-    return redirect('/addon/descriptor')
-
-
-@app.route('/addon/descriptor', methods=['GET'])
-def get_descriptor():
-    return jsonify(descriptor)
-
-
-@lifecycle('installed')
+@ac.lifecycle('installed')
 def installed():
     client = request.get_json()
     response = requests.get(
@@ -140,7 +76,7 @@ def installed():
     return '', 204
 
 
-@webpanel(key="userPanel",
+@ac.webpanel(key="userPanel",
           name="Bamboo Employee Information",
           location="atl.jira.view.issue.right.context",
           conditions=[{
@@ -174,6 +110,10 @@ def right_context():
         employee=employee
     )
 
+
+@ac.module(key="userPanel", name="Configure", location="configurePage")
+def configure_page():
+    return '', 204
 
 @app.template_filter('stripalpha')
 def strip_alpha(s):
