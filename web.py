@@ -96,10 +96,9 @@ def right_context(client):
     )
 
 
-@ac.module(key="configurePage", name="Configure", 
-           location="configurePage", methods=['GET', 'POST'])
-def configure_page():
-    return '', 204
+@ac.module(name="Configure")
+def configure_page(client):
+    return 'This is my configure page, it has a %s' % client, 200
 
 
 if __name__ == '__main__':
