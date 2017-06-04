@@ -6,9 +6,12 @@ from jwt.exceptions import DecodeError
 import re
 import requests
 
+
 class ACAddon(object):
     """Atlassian Connect Addon"""
-    def __init__(self, app, key, get_client_by_id_func=None, set_client_by_id_func=None):
+    def __init__(self, app, key, 
+                 get_client_by_id_func=None, 
+                 set_client_by_id_func=None):
         self.descriptor = {
             "name": "Add bamboohr information to tickets",
             "description": "Add bamboohr information to tickets",
@@ -62,14 +65,15 @@ class ACAddon(object):
 
             stored_client = self.get_client_by_id(client['clientKey'])
             if stored_client:
-                token = request.headers.get(
-                    'authorization', '').replace(r'^JWT ', '')
+                token = request.headers.get('authorization', '').lstrip('JWT ')
                 if not token:
                     # Is not first install, but did not sign the request
                     # properly for an update
                     return '', 401
                 try:
-                    jwt.decode(token, stored_client['sharedSecret'])
+                    jwt.decode(token, 
+                               stored_client['sharedSecret'], 
+                               audience=stored_client['clientKey'])
                 except (ValueError, DecodeError):
                     # Invalid secret, so things did not get installed
                     return '', 401
@@ -108,7 +112,6 @@ class ACAddon(object):
         return inner
 
     def webpanel(self, key, name, location, **kwargs):
-
         if not re.search(r"^[a-zA-Z0-9-]+$", key):
             raise Exception("Webpanel(%s) must match ^[a-zA-Z0-9-]+$" % key)
 
@@ -130,7 +133,13 @@ class ACAddon(object):
         ).append(webpanel_capability)
 
         def inner(func):
-            return self.app.route(rule=path, **kwargs)(func)
+            def inner_inner(*args, **kwargs):
+                client_key = self.auth.authenticate(
+                    request.method, request.url, request.headers)
+                client = self.get_client_by_id(client_key)
+                kwargs['client'] = client
+                return func(*args, **kwargs)
+            return self.app.route(rule=path, **kwargs)(inner_inner)
 
         return inner
 
