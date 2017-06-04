@@ -2,26 +2,7 @@ import unittest
 import web
 import json
 import requests_mock
-import jwt
-import time
-
-
-# Helpers
-def create_jwt_token(clientKey, sharedSecret):
-    return jwt.encode({
-        'sub': 'admin',
-        'iss': clientKey,
-        'context': {
-            'user': {
-                    'userKey': 'admin',
-                    'username': 'admin',
-                    'displayName': 'admin'
-                }
-        },
-        'exp': time.time() + (1000 * 10),
-        'iat': time.time()
-    }, sharedSecret)
-
+from atlassian_jwt.encode import encode_token
 
 consumer_info_response = """<?xml version="1.0" encoding="UTF-8"?>
     <consumer>
@@ -110,11 +91,15 @@ class FlaskrTestCase(unittest.TestCase):
                                content_type='application/json')
             self.assertEquals(204, rv.status_code)
             # Add auth
-            auth = create_jwt_token(client['clientKey'], client['sharedSecret'])
+            auth = encode_token(
+                'GET',
+                '/lifecycle/installed',
+                client['clientKey'],
+                client['sharedSecret'])
             rv = self.app.post('/lifecycle/installed',
                                data=json.dumps(client),
                                content_type='application/json',
-                               headers={'Authorization': auth})
+                               headers={'Authorization': 'JWT ' + auth})
             self.assertEquals(204, rv.status_code)
 
     def test_lifecycle_installed_multiple_invalid_auth(self):
@@ -133,11 +118,15 @@ class FlaskrTestCase(unittest.TestCase):
                                content_type='application/json')
             self.assertEquals(204, rv.status_code)
             # Add auth
-            auth = create_jwt_token(client['clientKey'], 'some other secret')
+            auth = encode_token(
+                'GET',
+                '/lifecycle/installed',
+                client['clientKey'],
+                'some other secret')
             rv = self.app.post('/lifecycle/installed',
                                data=json.dumps(client),
                                content_type='application/json',
-                               headers={'Authorization': auth})
+                               headers={'Authorization': 'JWT ' + auth})
             self.assertEquals(401, rv.status_code)
 
 
