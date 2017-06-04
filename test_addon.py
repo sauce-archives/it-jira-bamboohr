@@ -2,6 +2,7 @@ import unittest
 import web
 import json
 import requests_mock
+import requests
 from atlassian_jwt.encode import encode_token
 
 consumer_info_response = """<?xml version="1.0" encoding="UTF-8"?>
@@ -41,6 +42,15 @@ class FlaskrTestCase(unittest.TestCase):
             {"type": "jwt"},
             json.loads(rv.get_data())['authentication']
         )
+
+    def test_descriptor_should_validate(self):
+        rv = self.app.get('/addon/descriptor')
+        self.assertEquals(200, rv.status_code)
+        rv = requests.post(
+            'https://atlassian-connect-validator.herokuapp.com/validate',
+            data={'descriptor': rv.data, 'product': 'jira'}
+        )
+        self.assertIn('Validation passed', rv.text)
 
     def test_lifecycle_installed(self):
         with requests_mock.mock() as m:

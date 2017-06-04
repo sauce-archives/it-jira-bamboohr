@@ -10,6 +10,10 @@ import re
 import requests
 
 
+def to_camelcase(s):
+    return re.sub(r'(?!^)_([a-zA-Z])', lambda m: m.group(1).upper(), s)
+
+
 class ACAddon(object):
     """Atlassian Connect Addon"""
     def __init__(self, app, key, 
@@ -139,7 +143,7 @@ class ACAddon(object):
             self.descriptor.setdefault('modules', {})[location] = {
                 "url": path,
                 "name": {"value": name},
-                "key": func.__name__
+                "key": to_camelcase(func.__name__)
 
             }
             return self.route(anonymous=False, rule=path, **kwargs)(func)
