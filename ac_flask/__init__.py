@@ -10,6 +10,18 @@ import re
 import requests
 
 
+class SimpleAuthenticator(atlassian_jwt.Authenticator):
+    def __init__(self, addon, *args, **kwargs):
+        super(SimpleAuthenticator, self).__init__()
+        self.addon = addon
+
+    def get_shared_secret(self, client_key):
+        client = self.addon.get_client_by_id(client_key)
+        if client is None:
+            raise Exception('No client for ' + client_key)
+        return client['sharedSecret']
+
+
 def to_camelcase(s):
     return re.sub(r'(?!^)_([a-zA-Z])', lambda m: m.group(1).upper(), s)
 
@@ -48,15 +60,7 @@ class ACAddon(object):
         }
         self.get_client_by_id = get_client_by_id_func
         self.set_client_by_id = set_client_by_id_func
-
-        class SimpleAuthenticator(atlassian_jwt.Authenticator):
-            def get_shared_secret(self, client_key):
-                client = get_client_by_id_func(client_key)
-                if client is None:
-                    raise Exception('No client for ' + client_key)
-                return client['sharedSecret']
-
-        self.auth = SimpleAuthenticator()
+        self.auth = SimpleAuthenticator(addon=self)
 
         @app.route('/', methods=['GET'])
         def redirect_to_descriptor():
