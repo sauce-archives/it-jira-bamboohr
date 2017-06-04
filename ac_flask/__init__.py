@@ -1,5 +1,5 @@
 from flask import jsonify, redirect, request, abort
-from functools import wraps
+from functools import wraps, partial
 from jwt.exceptions import DecodeError
 import atlassian_jwt
 import httplib
@@ -51,7 +51,10 @@ class ACAddon(object):
 
         class SimpleAuthenticator(atlassian_jwt.Authenticator):
             def get_shared_secret(self, client_key):
-                return get_client_by_id_func(client_key)['sharedSecret']
+                client = get_client_by_id_func(client_key)
+                if client is None:
+                    raise Exception('No client for ' + client_key)
+                return client['sharedSecret']
 
         self.auth = SimpleAuthenticator()
 
@@ -145,18 +148,25 @@ class ACAddon(object):
 
         return inner
 
-    def module(self, key, name, location, **kwargs):
-        def inner(func):
-            path = "/module/" + key
-            self.descriptor.setdefault('modules', {})[location] = {
-                "url": path,
-                "name": {"value": name},
-                "key": to_camelcase(func.__name__)
+    def module(self, func=None, name=None, location=None, key=None, methods=['GET', 'POST']):
+        if func is None:
+            return partial(self.module, name=name, location=location, key=key, methods=methods)
 
-            }
-            return self.route(anonymous=False, rule=path, **kwargs)(func)
+        if key is None:
+            key = to_camelcase(func.__name__)
+        if location is None:
+            location = key
+        if name is None:
+            name = func.__name__
 
-        return inner
+        path = "/module/" + key
+        self.descriptor.setdefault('modules', {})[location] = {
+            "url": path,
+            "name": {"value": name},
+            "key": key
+
+        }
+        return self.route(anonymous=False, rule=path, methods=methods)(func)
 
     def webpanel(self, key, name, location, **kwargs):
         if not re.search(r"^[a-zA-Z0-9-]+$", key):
@@ -205,6 +215,7 @@ class ACAddon(object):
             client = self.get_client_by_id(client_key)
             if not client:
                 abort(401)
+            kwargs['client'] = client
             return func(*args, **kwargs)
 
         return inner
