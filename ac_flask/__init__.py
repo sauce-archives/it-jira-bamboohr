@@ -70,16 +70,21 @@ class ACAddon(object):
             app.config.from_object(config)
 
         if env_prefix is not None:
-            env_vars = {key[len(env_prefix):]: val for key, val in os.environ.items()}
+            env_vars = {key[len(env_prefix):]: val for 
+                        key, val in os.environ.items()}
             app.config.update(env_vars)
 
         if app.config['DEBUG']:
-            # These two lines enable debugging at httplib level (requests->urllib3->httplib)
-            # You will see the REQUEST, including HEADERS and DATA, and RESPONSE with HEADERS but without DATA.
-            # The only thing missing will be the response.body which is not logged.
+            # These two lines enable debugging at httplib level 
+            # (requests->urllib3->httplib)
+            # You will see the REQUEST, including HEADERS and DATA, and 
+            # RESPONSE with HEADERS but without DATA.
+            # The only thing missing will be the response.body which is not 
+            # logged.
             httplib.HTTPConnection.debuglevel = 1
 
-            # You must initialize logging, otherwise you'll not see debug output.
+            # You must initialize logging, otherwise you'll not see debug
+            # output.
             logging.basicConfig()
             logging.getLogger().setLevel(logging.DEBUG)
             requests_log = logging.getLogger("requests.packages.urllib3")
@@ -190,11 +195,11 @@ class ACAddon(object):
         path = '/' + path if not path.startswith('/') else path
         return base + path
 
-    def require_tenant(self, func):
+    def require_client(self, func):
         @wraps(func)
         def inner(*args, **kwargs):
             client_key = self.auth.authenticate(
-                request.method, 
+                request.method,
                 request.url,
                 request.headers)
             client = self.get_client_by_id(client_key)
@@ -206,12 +211,11 @@ class ACAddon(object):
 
     def route(self, anonymous=False, *args, **kwargs):
         """
-        Decorator for routes with defaulted required authenticated tenants
+        Decorator for routes with defaulted required authenticated client
         """
         def inner(func):
             if not anonymous:
-                func = self.require_tenant(func)
+                func = self.require_client(func)
             func = self.app.route(*args, **kwargs)(func)
             return func
-
         return inner
