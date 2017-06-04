@@ -26,7 +26,11 @@ setup(
     packages=find_packages(),
     platforms='any',
     install_requires=[
-        'Flask'
+        'Flask',
+        'requests'
+    ],
+    test_requires=[
+        'requests_mock'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
