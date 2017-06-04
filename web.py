@@ -3,14 +3,17 @@ import os
 import atlassian_jwt
 import requests
 import cPickle as pickle
-import jwt as jwt
 from PyBambooHR import PyBambooHR
 from flask import Flask, request, render_template
 from ac_flask import ACAddon
-from jwt.exceptions import DecodeError
 
 app = Flask(__name__)
 app.clients = None
+
+
+@app.template_filter('stripalpha')
+def strip_alpha(s):
+    return re.sub(r'[^\d+]+', '', s)
 
 
 def save_clients():
@@ -98,11 +101,6 @@ def right_context():
            location="configurePage", methods=['GET', 'POST'])
 def configure_page():
     return '', 204
-
-
-@app.template_filter('stripalpha')
-def strip_alpha(s):
-    return re.sub(r'[^\d+]+', '', s)
 
 
 if __name__ == '__main__':
