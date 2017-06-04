@@ -16,29 +16,32 @@ def to_camelcase(s):
 
 class ACAddon(object):
     """Atlassian Connect Addon"""
-    def __init__(self, app, key, 
+    def __init__(self, 
+                 app=None,
+                 key=None,
                  get_client_by_id_func=None, 
                  set_client_by_id_func=None,
+                 name=None,
+                 description=None,
                  config=None,
-                 env_prefix="AC_"):
+                 env_prefix="AC_",
+                 vendor_url=None,
+                 vendor_name=None):
         self.app = app
         self._init_app(app, config, env_prefix)
 
         self.descriptor = {
-            "name": "Add bamboohr information to tickets",
-            "description": "Add bamboohr information to tickets",
-            "key": key,
+            "name": name or app.config.get('ADDON_NAME', ""),
+            "description": description or app.config.get('ADDON_DESCRIPTION', ""),
+            "key": key or app.config.get('ADDON_KEY'),
             "authentication": {"type": "jwt"},
             "baseUrl": self._relative_to_base('/'),
             "scopes": ["READ"],
             "vendor": {
-                "name": "Sauce Labs",
-                "url": "https://saucelabs.com"
+                "name": vendor_name or app.config.get('ADDON_VENDOR_NAME'),
+                "url": vendor_url or app.config.get('ADDON_VENDOR_URL')
             },
-            "lifecycle": {
-                "installed": "/lifecycle/installed",
-                "enabled": "/ping",
-            },
+            "lifecycle": {},
             "links": {
                 "self": self._relative_to_base("/addon/descriptor")
             },

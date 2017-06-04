@@ -9,6 +9,11 @@ from ac_flask import ACAddon
 
 app = Flask(__name__)
 app.clients = None
+app.config['ADDON_VENDOR_URL'] = 'https://saucelabs.com'
+app.config['ADDON_VENDOR_NAME'] = 'Sauce Labs'
+app.config['ADDON_KEY'] = 'it-confluence-bamboohr'
+app.config['ADDON_NAME'] = 'BambooHR Integration'
+app.config['ADDON_DESCRIPTION'] = 'Add bamboohr information to tickets'
 
 
 @app.template_filter('stripalpha')
@@ -45,16 +50,13 @@ def set_client(client):
     save_clients()
 
 
-ADDON_KEY = "it-confluence-bamboohr"
 bamboo = PyBambooHR(
     subdomain=os.environ['BAMBOOHR_SUBDOMAIN'],
     api_key=os.environ['BAMBOOHR_API_KEY']
 )
 ac = ACAddon(app,
-             key=ADDON_KEY,
              get_client_by_id_func=get_client,
-             set_client_by_id_func=set_client
-             )
+             set_client_by_id_func=set_client)
 
 
 @ac.lifecycle('installed')
@@ -73,7 +75,7 @@ def right_context(client):
 
     issue_url = '/rest/api/latest/issue/' + request.args.get('issueKey')
     jwt_authorization = 'JWT %s' % atlassian_jwt.encode_token(
-        'GET', issue_url, ADDON_KEY, client['sharedSecret'])
+        'GET', issue_url, app.config.get('ADDON_KEY'), client['sharedSecret'])
     result = requests.get(
         client['baseUrl'].rstrip('/') + issue_url,
         headers={'Authorization': jwt_authorization})
