@@ -1,9 +1,10 @@
 from flask import jsonify, redirect, request, abort
 from functools import wraps
 import atlassian_jwt
-import logging
+import jwt
+from jwt.exceptions import DecodeError
 import re
-
+import requests
 
 class ACAddon(object):
     """Atlassian Connect Addon"""
@@ -28,23 +29,55 @@ class ACAddon(object):
         self.set_client_by_id = set_client_by_id_func
 
         self.app = app
+
         class SimpleAuthenticator(atlassian_jwt.Authenticator):
             def get_shared_secret(self, client_key):
                 return get_client_by_id_func(client_key)['sharedSecret']
 
-
         self.auth = SimpleAuthenticator()
-
 
         @app.route('/', methods=['GET'])
         def redirect_to_descriptor():
             return redirect('/addon/descriptor')
 
-
         @app.route('/addon/descriptor', methods=['GET'])
         def get_descriptor():
             return jsonify(self.descriptor)
 
+    def _installed_wrapper(self, func):
+        def inner(*args, **kwargs):
+            client = request.get_json()
+            response = requests.get(
+                client['baseUrl'].rstrip('/') + 
+                '/plugins/servlet/oauth/consumer-info')
+            response.raise_for_status()
+
+            key = re.search(r"<key>(.*)</key>", response.text).groups()[0]
+            publicKey = re.search(  
+                r"<publicKey>(.*)</publicKey>", response.text
+            ).groups()[0]
+
+            if key != client['clientKey'] or publicKey != client['publicKey']:
+                raise Exception("Invalid Credentials")
+
+            stored_client = self.get_client_by_id(client['clientKey'])
+            if stored_client:
+                token = request.headers.get(
+                    'authorization', '').replace(r'^JWT ', '')
+                if not token:
+                    # Is not first install, but did not sign the request
+                    # properly for an update
+                    return '', 401
+                try:
+                    jwt.decode(token, stored_client['sharedSecret'])
+                except (ValueError, DecodeError):
+                    # Invalid secret, so things did not get installed
+                    return '', 401
+
+            self.set_client_by_id(client)
+            kwargs['client'] = client
+            return func(*args, **kwargs)
+        return inner
 
     def lifecycle(self, name, path=None):
         if path is None:
@@ -53,10 +86,13 @@ class ACAddon(object):
         self.descriptor.setdefault('lifecycle', {})[name] = path
 
         def inner(func):
-            return self.app.route(rule=path, methods=['POST'])(func)
+            if name == 'installed':
+                return self.app.route(rule=path, methods=['POST'])(
+                    self._installed_wrapper(func))
+            else:
+                return self.app.route(rule=path, methods=['POST'])(func)
 
         return inner
-
 
     def module(self, key, name, location, **kwargs):
         def inner(func):

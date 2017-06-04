@@ -47,38 +47,15 @@ bamboo = PyBambooHR(
     subdomain=os.environ['BAMBOOHR_SUBDOMAIN'],
     api_key=os.environ['BAMBOOHR_API_KEY']
 )
-ac = ACAddon(app, key=ADDON_KEY, get_client_by_id_func=get_client, set_client_by_id_func=set_client)
+ac = ACAddon(app,
+             key=ADDON_KEY,
+             get_client_by_id_func=get_client,
+             set_client_by_id_func=set_client
+             )
 
 
 @ac.lifecycle('installed')
-def installed():
-    client = request.get_json()
-    response = requests.get(
-        client['baseUrl'].rstrip('/') + '/plugins/servlet/oauth/consumer-info')
-    response.raise_for_status()
-
-    key = re.search(r"<key>(.*)</key>", response.text).groups()[0]
-    publicKey = re.search(  
-        r"<publicKey>(.*)</publicKey>", response.text
-    ).groups()[0]
-
-    if key != client['clientKey'] or publicKey != client['publicKey']:
-        raise Exception("Invalid Credentials")
-
-    if get_client(client['clientKey']):
-        token = request.headers.get('authorization', '').replace(r'^JWT ', '')
-        if not token:
-            # Is not first install, but did not sign the request properly for
-            # an update
-            return '', 401
-        try:
-            jwt.decode(token, get_client(client['clientKey'])['sharedSecret'])
-        except (ValueError, DecodeError):
-            # Invalid secret, so things did not get installed
-            return '', 401
-
-    set_client(client)
-    save_clients()
+def installed(client):
     return '', 204
 
 
@@ -90,8 +67,8 @@ def installed():
                  "params": {"projectTypeKey": "service_desk"}
              }])
 def right_context():
-    client_key = auth.authenticate(request.method, request.url,
-                                   request.headers)
+    client_key = auth.authenticate(
+        request.method, request.url, request.headers)
     client = get_client(client_key)
 
     ping_url = '/rest/api/latest/issue/' + request.args.get('issueKey')
