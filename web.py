@@ -71,11 +71,11 @@ def installed(client):
              }])
 def right_context(client):
 
-    ping_url = '/rest/api/latest/issue/' + request.args.get('issueKey')
+    issue_url = '/rest/api/latest/issue/' + request.args.get('issueKey')
     jwt_authorization = 'JWT %s' % atlassian_jwt.encode_token(
-        'GET', ping_url, ADDON_KEY, client['sharedSecret'])
+        'GET', issue_url, ADDON_KEY, client['sharedSecret'])
     result = requests.get(
-        client['baseUrl'].rstrip('/') + ping_url,
+        client['baseUrl'].rstrip('/') + issue_url,
         headers={'Authorization': jwt_authorization})
     result.raise_for_status()
     email = result.json()['fields']['reporter']['emailAddress']
