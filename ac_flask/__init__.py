@@ -71,7 +71,7 @@ class ACAddon(object):
                     # properly for an update
                     return '', 401
                 try:
-                    jwt.decode(token, 
+                    jwt.decode(token,
                                stored_client['sharedSecret'], 
                                audience=stored_client['clientKey'])
                 except (ValueError, DecodeError):

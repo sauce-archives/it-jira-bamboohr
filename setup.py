@@ -30,7 +30,8 @@ setup(
         'requests'
     ],
     test_requires=[
-        'requests_mock'
+        'requests_mock',
+        'mock'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

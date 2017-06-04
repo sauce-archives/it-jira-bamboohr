@@ -70,6 +70,7 @@ def installed(client):
                  "params": {"projectTypeKey": "service_desk"}
              }])
 def right_context(client):
+
     ping_url = '/rest/api/latest/issue/' + request.args.get('issueKey')
     jwt_authorization = 'JWT %s' % atlassian_jwt.encode_token(
         'GET', ping_url, ADDON_KEY, client['sharedSecret'])
