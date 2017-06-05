@@ -98,7 +98,10 @@ def right_context(client):
 
 @ac.module(name="Configure")
 def configure_page(client):
-    return 'This is my configure page, it has a %s' % client, 200
+    return render_template(
+        'configure_page.html',
+        xdm_e=request.args.get('xdm_e')
+    )
 
 
 if __name__ == '__main__':

@@ -1,0 +1,30 @@
+<html>
+
+    <head>
+        <script src="{{ xdm_e }}/atlassian-connect/all.js"></script>
+        <link rel="stylesheet" href="{{ xdm_e }}/atlassian-connect/all.css">
+    </head>
+
+    <body>
+        <h1>Lets Configure</h1>
+        <form method="post" class="aui">
+            <div class="field-group">
+                <label for="bamboohr-api">API Key
+                    <span class="aui-icon icon-required">(required)</span></label>
+                <input class="text medium-field" type="text" id="bamboohr-api" name="bamboohr-api" placeholder="" required>
+                <div class="description">Bamboo HR API Key</div>
+            </div>
+            <div class="field-group">
+                <label for="bamboohr-subdomain">Subdomain
+                    <span class="aui-icon icon-required">(required)</span></label>
+                <input class="text medium-field" type="text" id="bamboohr-subdomain" name="bamboohr-subdomain" placeholder="" required>
+                <div class="description">&lt;subdomain&gt;.bamboohr.com</div>
+            </div>
+            <div class="buttons-container">
+                <div class="buttons">
+                    <input class="button submit" type="submit" value="Save" id="comment-save-button">
+                </div>
+            </div>
+        </form>
+    </body>
+</html>

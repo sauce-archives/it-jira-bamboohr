@@ -67,14 +67,15 @@ class WebTestCase(unittest.TestCase):
             publicKey='public123',
             sharedSecret='myscret')
         web.app.clients[client['clientKey']] = client
+        url = '/module/configurePage?xdm_e=%s' % client['baseUrl']
 
         auth = encode_token(
             'GET',
-            '/module/configurePage',
+            url,
             client['clientKey'],
             client['sharedSecret'])
 
-        rv = self.app.get('/module/configurePage',
+        rv = self.app.get(url,
                           headers={'authorization': 'JWT ' + auth})
         self.assertEquals(200, rv.status_code)
         self.assertIn('<td>Test Person</td>', rv.data)
