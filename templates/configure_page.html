@@ -3,28 +3,43 @@
     <head>
         <script src="{{ xdm_e }}/atlassian-connect/all.js"></script>
         <link rel="stylesheet" href="{{ xdm_e }}/atlassian-connect/all.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/css/aui.css" media="all">
+        <!--[if lt IE 9]><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/css/aui-ie.css" media="all"><![endif]-->
+        <!--[if IE 9]><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/css/aui-ie9.css" media="all"><![endif]-->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/js/aui.js"></script>
+        <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/js/aui-ie.js"></script><![endif]-->
     </head>
 
-    <body>
-        <h1>Lets Configure</h1>
-        <form method="post" class="aui">
-            <div class="field-group">
-                <label for="bamboohr-api">API Key
-                    <span class="aui-icon icon-required">(required)</span></label>
-                <input class="text medium-field" type="text" id="bamboohr-api" name="bamboohr-api" placeholder="" required>
-                <div class="description">Bamboo HR API Key</div>
-            </div>
-            <div class="field-group">
-                <label for="bamboohr-subdomain">Subdomain
-                    <span class="aui-icon icon-required">(required)</span></label>
-                <input class="text medium-field" type="text" id="bamboohr-subdomain" name="bamboohr-subdomain" placeholder="" required>
-                <div class="description">&lt;subdomain&gt;.bamboohr.com</div>
-            </div>
-            <div class="buttons-container">
-                <div class="buttons">
-                    <input class="button submit" type="submit" value="Save" id="comment-save-button">
+    <bodyy class="aui-page-focused">
+        <div id="page">
+            <section id="content" role="main">
+                <div class="aui-page-panel">
+                    <div class="aui-page-panel-inner">
+                        <section class="aui-page-panel-content">
+                            <h2>Lets Configure</h2>
+                            <form action="{{url}}" method="post" class="aui">
+                                <div class="field-group">
+                                    <label for="bamboohr_api">API Key <span class="aui-icon icon-required">(required)</span></label>
+                                    <input class="text xlarge-field" type="text" id="bamboohr_api" name="bamboohr_api" placeholder="" required maxlength="40">
+                                    <div class="description">Bamboo HR API Key</div>
+                                    <!-- <div class="error">Error message here</div> -->
+                                </div>
+                                <div class="field-group">
+                                    <label for="bamboohr_subdomain">Subdomain<span class="aui-icon icon-required">(required)</span></label>
+                                    <input class="text medium-long-field" type="text" id="bamboohr_subdomain" name="bamboohr_subdomain" placeholder="" required>
+                                    <div class="description">&lt;subdomain&gt;.bamboohr.com</div>
+                                </div>
+                                <div class="buttons-container">
+                                    <div class="buttons">
+                                        <input class="button submit" type="submit" value="Save" id="comment-save-button">
+                                    </div>
+                                </div>
+                            </form>
+                        </section>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </section>
+        </div>
     </body>
 </html>

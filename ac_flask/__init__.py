@@ -130,8 +130,8 @@ class ACAddon(object):
                     return '', 401
                 try:
                     jwt.decode(token,
-                               stored_client['sharedSecret'], 
-                               verify_aud=False)
+                               stored_client['sharedSecret'],
+                               options={"verify_aud": False})
                 except (ValueError, DecodeError):
                     # Invalid secret, so things did not get installed
                     return '', 401
