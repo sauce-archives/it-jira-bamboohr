@@ -3,4 +3,5 @@ invoke==0.17.0
 PyBambooHR==0.7.1
 Flask-SQLAlchemy==2.2
 https://github.com/halkeye/ac-flask/archive/master.zip#egg=ac_flask
+raven[flask]
 

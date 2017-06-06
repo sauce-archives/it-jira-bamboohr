@@ -6,6 +6,7 @@ from PyBambooHR import PyBambooHR
 from flask import Flask, request, render_template
 from ac_flask import ACAddon
 from flask_sqlalchemy import SQLAlchemy
+from raven.contrib.flask import Sentry
 
 try:
     # python2
@@ -24,6 +25,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'SQLALCHEMY_DATABASE_URI', 'sqlite:////tmp/test.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+if os.environ.get('SENTRY_DSN'):
+    sentry = Sentry(app, dsn=os.environ['SENTRY_DSN'])
 
 
 class Client(db.Model):
