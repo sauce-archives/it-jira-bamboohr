@@ -1,3 +1,4 @@
 atlassian-jwt==1.6
 invoke==0.17.0
 PyBambooHR==0.7.1
+git+git://github.com/halkeye/ac-flask.git#egg=ac_flask
