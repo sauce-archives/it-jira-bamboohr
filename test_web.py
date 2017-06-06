@@ -20,7 +20,7 @@ class WebTestCase(unittest.TestCase):
 
     def setUp(self):
         self.app = web.app.test_client()
-        web.app.clients = {}
+        web.delete_all_clients()
 
     def tearDown(self):
         pass
@@ -60,7 +60,7 @@ class WebTestCase(unittest.TestCase):
                 clientKey='abc123',
                 publicKey='public123',
                 sharedSecret='myscret')
-            web.app.clients[client['clientKey']] = client
+            web.set_client(client)
 
             m.get('https://gavindev.atlassian.net'
                   '/rest/api/latest/issue/TEST-1',
@@ -69,8 +69,8 @@ class WebTestCase(unittest.TestCase):
             auth = encode_token(
                 'GET',
                 '/webpanel/userPanel?issueKey=TEST-1',
-                client['clientKey'],
-                client['sharedSecret'])
+                client.get('clientKey'),
+                client.get('sharedSecret'))
 
             rv = self.app.get('/webpanel/userPanel?issueKey=TEST-1',
                               headers={'authorization': 'JWT ' + auth})
@@ -84,7 +84,7 @@ class WebTestCase(unittest.TestCase):
             clientKey='abc123',
             publicKey='public123',
             sharedSecret='myscret',)
-        web.app.clients[client['clientKey']] = client
+        web.set_client(client)
         args = {"xdm_e": client['baseUrl']}
         url = '/module/configurePage?' + urlencode(args)
 

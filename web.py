@@ -2,10 +2,11 @@ import re
 import os
 from atlassian_jwt import encode_token
 import requests
-import cPickle as pickle
 from PyBambooHR import PyBambooHR
 from flask import Flask, request, render_template
 from ac_flask import ACAddon
+from flask_sqlalchemy import SQLAlchemy
+
 try:
     # python2
     from urllib import urlencode
@@ -14,12 +15,30 @@ except ImportError:
     from urllib.parse import urlencode
 
 app = Flask(__name__)
-app.clients = None
 app.config['ADDON_VENDOR_URL'] = 'https://saucelabs.com'
 app.config['ADDON_VENDOR_NAME'] = 'Sauce Labs'
-app.config['ADDON_KEY'] = 'it-confluence-bamboohr'
+app.config['ADDON_KEY'] = 'it-jira-bamboohr'
 app.config['ADDON_NAME'] = 'BambooHR Integration'
 app.config['ADDON_DESCRIPTION'] = 'Add bamboohr information to tickets'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+
+class Client(db.Model):
+    clientKey = db.Column(db.String(40), primary_key=True)
+    baseUrl = db.Column(db.String(100))
+    sharedSecret = db.Column(db.String(100))
+    bamboohrApi = db.Column(db.String(40))
+    bamboohrSubdomain = db.Column(db.String(40))
+
+    def __init__(self, data):
+        for k, v in data.items():
+            setattr(self, k, v)
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) 
+                for c in self.__table__.columns}
 
 
 @app.template_filter('stripalpha')
@@ -27,39 +46,28 @@ def strip_alpha(s):
     return re.sub(r'[^\d+]+', '', s)
 
 
-def save_clients():
-    with open('clients.pk', 'wb') as f:
-        pickle.dump(app.clients, f, pickle.HIGHEST_PROTOCOL)
-
-
-def load_clients():
-    try:
-        with open('clients.pk', 'rb') as f:
-            app.clients = pickle.load(f)
-    except:
-        app.clients = {}
-        pass
-
-
 def get_client(id):
-    if app.clients is None:
-        load_clients()
-
-    return app.clients.get(id)
+    return Client.query.filter_by(clientKey=id).first()
 
 
 def set_client(client):
-    if app.clients is None:
-        load_clients()
+    existing_client = get_client(client['clientKey'])
+    if existing_client:
+        existing_client.update(client)
+    else:
+        client = Client(client)
+        db.session.add(client)
+    db.session.commit()
 
-    app.clients[client['clientKey']] = client
-    save_clients()
+
+def delete_all_clients():
+    Client.query.delete()
 
 
 def get_bamboohr(client):
     return PyBambooHR(
-        subdomain=client['bamboohr_subdomain'],
-        api_key=client['bamboohr_api']
+        subdomain=client['bamboohrSubdomain'],
+        api_key=client['bamboohrApi']
     )
 
 
@@ -83,9 +91,10 @@ def installed(client):
 def right_context(client):
     issue_url = '/rest/api/latest/issue/' + request.args.get('issueKey')
     jwt_authorization = 'JWT %s' % encode_token(
-        'GET', issue_url, app.config.get('ADDON_KEY'), client['sharedSecret'])
+        'GET', issue_url, app.config.get('ADDON_KEY'), 
+        client.sharedSecret)
     result = requests.get(
-        client['baseUrl'].rstrip('/') + issue_url,
+        client.baseUrl.rstrip('/') + issue_url,
         headers={'Authorization': jwt_authorization})
     result.raise_for_status()
     email = result.json()['fields']['reporter']['emailAddress']
@@ -109,8 +118,8 @@ def right_context(client):
 def configure_page(client):
     if request.method.lower() == 'post':
         try:
-            client['bamboohr_api'] = request.form['bamboohr_api']
-            client['bamboohr_subdomain'] = request.form['bamboohr_subdomain']
+            client['bamboohrApi'] = request.form['bamboohr_api']
+            client['bamboohrSubdomain'] = request.form['bamboohr_subdomain']
             set_client(client)
             return render_template('configure_page_success.html')
         except ValueError:
@@ -122,8 +131,8 @@ def configure_page(client):
     signature = encode_token(
         'POST',
         request.path + '?' + urlencode(args),
-        client['clientKey'],
-        client['sharedSecret'])
+        client.clientKey,
+        client.sharedSecret)
     args['jwt'] = signature
 
     return render_template(
