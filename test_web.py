@@ -20,9 +20,14 @@ class WebTestCase(unittest.TestCase):
 
     def setUp(self):
         self.app = web.app.test_client()
-        web.delete_all_clients()
+        web.Client.query.filter(
+            web.Client.clientKey.startswith('test_')
+        ).delete(synchronize_session='fetch')
 
     def tearDown(self):
+        web.Client.query.filter(
+            web.Client.clientKey.startswith('test_')
+        ).delete(synchronize_session='fetch')
         pass
 
     @patch('web.get_bamboohr')
@@ -57,7 +62,7 @@ class WebTestCase(unittest.TestCase):
         with requests_mock.mock() as m:
             client = dict(
                 baseUrl='https://gavindev.atlassian.net',
-                clientKey='abc123',
+                clientKey='test_web_panel',
                 publicKey='public123',
                 sharedSecret='myscret')
             web.set_client(client)
@@ -81,7 +86,7 @@ class WebTestCase(unittest.TestCase):
     def test_configurePage(self):
         client = dict(
             baseUrl='https://gavindev.atlassian.net',
-            clientKey='abc123',
+            clientKey='test_configurePage',
             publicKey='public123',
             sharedSecret='myscret',)
         web.set_client(client)
@@ -95,6 +100,29 @@ class WebTestCase(unittest.TestCase):
             client['sharedSecret'])
 
         rv = self.app.get('/module/configurePage?' + urlencode(args))
+        self.assertEquals(200, rv.status_code)
+
+    def test_post_configurePage(self):
+        client = dict(
+            baseUrl='https://gavindev.atlassian.net',
+            clientKey='test_post_configurePage',
+            publicKey='public123',
+            sharedSecret='myscret',)
+        web.set_client(client)
+        args = {"xdm_e": client['baseUrl']}
+        url = '/module/configurePage?' + urlencode(args)
+
+        args['jwt'] = encode_token(
+            'POST',
+            url,
+            client['clientKey'],
+            client['sharedSecret'])
+
+        rv = self.app.post('/module/configurePage?' + urlencode(args),
+                           data={
+                               "bamboohr_subdomain": "notreal",
+                               "bamboohr_api": "ILikeMyRandomAPIKey",
+                           })
         self.assertEquals(200, rv.status_code)
 
 

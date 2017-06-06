@@ -36,6 +36,9 @@ class Client(db.Model):
         for k, v in data.items():
             setattr(self, k, v)
 
+    def __getitem__(self, k):
+        return getattr(self, k)
+
     def as_dict(self):
         return {c.name: getattr(self, c.name) 
                 for c in self.__table__.columns}
@@ -53,7 +56,8 @@ def get_client(id):
 def set_client(client):
     existing_client = get_client(client['clientKey'])
     if existing_client:
-        existing_client.update(client)
+        for k, v in client.as_dict().items():
+            setattr(existing_client, k, v)
     else:
         client = Client(client)
         db.session.add(client)
@@ -118,8 +122,8 @@ def right_context(client):
 def configure_page(client):
     if request.method.lower() == 'post':
         try:
-            client['bamboohrApi'] = request.form['bamboohr_api']
-            client['bamboohrSubdomain'] = request.form['bamboohr_subdomain']
+            client.bamboohrApi = request.form['bamboohr_api']
+            client.bamboohrSubdomain = request.form['bamboohr_subdomain']
             set_client(client)
             return render_template('configure_page_success.html')
         except ValueError:
