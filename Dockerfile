@@ -10,4 +10,4 @@ RUN pip install gunicorn json-logging-py -r requirements.txt
 
 EXPOSE 3000
 
-ENTRYPOINT ["/usr/local/bin/gunicorn", "--config", "/gunicorn.conf", "--log-config", "/logging.conf", "-b", ":3000", "web:app"]
+ENTRYPOINT ["/usr/local/bin/gunicorn", "--config", "/app/gunicorn.conf", "--log-config", "/app/logging.conf", "-b", ":3000", "web:app"]
