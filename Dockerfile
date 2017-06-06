@@ -1,7 +1,11 @@
 FROM python:2.7-slim
 
-COPY gunicorn.conf logging.conf requirements.txt tasks.py tasks.py web.py /
-COPY templates/ /templates/
+RUN apt-get update && apt-get install --yes build-essential libmysqlclient-dev
+
+RUN mkdir /app
+WORKDIR /app
+COPY gunicorn.conf logging.conf requirements.txt tasks.py tasks.py web.py /app/
+COPY templates/ /app/templates/
 RUN pip install MySQL-python==1.2.5 gunicorn json-logging-py -r requirements.txt
 
 EXPOSE 3000
