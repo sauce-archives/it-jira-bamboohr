@@ -1,7 +1,8 @@
 FROM python:2.7-slim
 
-COPY gunicorn.conf logging.conf requirements.txt tasks.py templates tasks.py web.py /
-RUN pip install gunicorn json-logging-py -r requirements.txt
+COPY gunicorn.conf logging.conf requirements.txt tasks.py tasks.py web.py /
+COPY templates/ /templates/
+RUN pip install MySQL-python==1.2.5 gunicorn json-logging-py -r requirements.txt
 
 EXPOSE 3000
 
