@@ -20,7 +20,8 @@ app.config['ADDON_VENDOR_NAME'] = 'Sauce Labs'
 app.config['ADDON_KEY'] = 'it-jira-bamboohr'
 app.config['ADDON_NAME'] = 'BambooHR Integration'
 app.config['ADDON_DESCRIPTION'] = 'Add bamboohr information to tickets'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'SQLALCHEMY_DATABASE_URI', 'sqlite:////tmp/test.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
