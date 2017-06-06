@@ -47,7 +47,7 @@ class Client(db.Model):
 
 @app.template_filter('stripalpha')
 def strip_alpha(s):
-    return re.sub(r'[^\d+]+', '', s)
+    return re.sub(r'[^\d+]+', '', s or '')
 
 
 def get_client(id):
