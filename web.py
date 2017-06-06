@@ -146,6 +146,11 @@ def configure_page(client):
     )
 
 
+@app.route('/healthcheck')
+def healthcheck():
+    return 'OK', 200
+
+
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
     app.config['TEMPLATES_AUTO_RELOAD'] = True
