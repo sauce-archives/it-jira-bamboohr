@@ -30,7 +30,7 @@ if os.environ.get('SENTRY_DSN'):
 
 
 class Client(db.Model):
-    clientKey = db.Column(db.String(40), primary_key=True)
+    clientKey = db.Column(db.String(50), primary_key=True)
     baseUrl = db.Column(db.String(100))
     sharedSecret = db.Column(db.String(100))
     bamboohrApi = db.Column(db.String(40))
