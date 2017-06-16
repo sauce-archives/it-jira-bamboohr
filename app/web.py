@@ -1,12 +1,18 @@
-import re
 import os
-from atlassian_jwt import encode_token
+import re
+
 import requests
+from atlassian_jwt import encode_token
+from flask import Flask, render_template, request
+from flask_atlassian_connect import AtlassianConnect
 from PyBambooHR import PyBambooHR
-from flask import Flask, request, render_template
-from ac_flask import ACAddon
-from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
+from werkzeug.contrib.fixers import ProxyFix
+
+from flask_sslify import SSLify
+
+from .client import Client
+from .shared import db
 
 try:
     # python2
@@ -16,36 +22,14 @@ except ImportError:
     from urllib.parse import urlencode
 
 app = Flask(__name__)
-app.config['ADDON_VENDOR_URL'] = 'https://saucelabs.com'
-app.config['ADDON_VENDOR_NAME'] = 'Sauce Labs'
-app.config['ADDON_KEY'] = 'it-jira-bamboohr'
-app.config['ADDON_NAME'] = 'BambooHR Integration'
-app.config['ADDON_DESCRIPTION'] = 'Add bamboohr information to tickets'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'SQLALCHEMY_DATABASE_URI', 'sqlite:////tmp/test.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+app.wsgi_app = ProxyFix(app.wsgi_app)
+sslify = SSLify(app)
+app.config.from_object('app.config.%sConfig' %
+                       os.environ.get('FLASK_ENV', 'development').title())
+db.init_app(app)
 if os.environ.get('SENTRY_DSN'):
     sentry = Sentry(app, dsn=os.environ['SENTRY_DSN'])
-
-
-class Client(db.Model):
-    clientKey = db.Column(db.String(50), primary_key=True)
-    baseUrl = db.Column(db.String(100))
-    sharedSecret = db.Column(db.String(100))
-    bamboohrApi = db.Column(db.String(40))
-    bamboohrSubdomain = db.Column(db.String(40))
-
-    def __init__(self, data):
-        for k, v in data.items():
-            setattr(self, k, v)
-
-    def __getitem__(self, k):
-        return getattr(self, k)
-
-    def as_dict(self):
-        return {c.name: getattr(self, c.name) 
-                for c in self.__table__.columns}
+ac = AtlassianConnect(app, client_class=Client)
 
 
 @app.template_filter('stripalpha')
@@ -53,35 +37,11 @@ def strip_alpha(s):
     return re.sub(r'[^\d+]+', '', s or '')
 
 
-def get_client(id):
-    return Client.query.filter_by(clientKey=id).first()
-
-
-def set_client(client):
-    existing_client = get_client(client['clientKey'])
-    if existing_client:
-        for k, v in client.as_dict().items():
-            setattr(existing_client, k, v)
-    else:
-        client = Client(client)
-        db.session.add(client)
-    db.session.commit()
-
-
-def delete_all_clients():
-    Client.query.delete()
-
-
 def get_bamboohr(client):
     return PyBambooHR(
         subdomain=client['bamboohrSubdomain'],
         api_key=client['bamboohrApi']
     )
-
-
-ac = ACAddon(app,
-             get_client_by_id_func=get_client,
-             set_client_by_id_func=set_client)
 
 
 @ac.lifecycle('installed')
@@ -122,13 +82,13 @@ def right_context(client):
     )
 
 
-@ac.module(name="Configure")
+@ac.module("configurePage", name="Configure")
 def configure_page(client):
     if request.method.lower() == 'post':
         try:
             client.bamboohrApi = request.form['bamboohr_api']
             client.bamboohrSubdomain = request.form['bamboohr_subdomain']
-            set_client(client)
+            Client.save(client)
             return render_template('configure_page_success.html')
         except ValueError:
             pass

@@ -1,8 +1,8 @@
 import unittest
-import web
 from atlassian_jwt.encode import encode_token
 import requests_mock
 from mock import patch
+from .. import app, db, Client
 try:
     # python2
     from urllib import urlencode
@@ -19,18 +19,15 @@ issue_test1_response = """
 class WebTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.app = web.app.test_client()
-        web.Client.query.filter(
-            web.Client.clientKey.startswith('test_')
-        ).delete(synchronize_session='fetch')
+        self.app = app.test_client()
+        app.debug = True
+        with app.app_context():
+            db.create_all()
 
     def tearDown(self):
-        web.Client.query.filter(
-            web.Client.clientKey.startswith('test_')
-        ).delete(synchronize_session='fetch')
         pass
 
-    @patch('web.get_bamboohr')
+    @patch('app.web.get_bamboohr')
     def test_web_panel(self, mock_get_bamboohr):
         employee = {
             "id": "123",
@@ -65,19 +62,21 @@ class WebTestCase(unittest.TestCase):
                 clientKey='test_web_panel',
                 publicKey='public123',
                 sharedSecret='myscret')
-            web.set_client(client)
+            with app.app_context():
+                Client.save(client)
 
             m.get('https://gavindev.atlassian.net'
                   '/rest/api/latest/issue/TEST-1',
                   text=issue_test1_response)
 
+            url = '/atlassian_connect/webpanel/userPanel?issueKey=TEST-1'
             auth = encode_token(
                 'GET',
-                '/webpanel/userPanel?issueKey=TEST-1',
+                url,
                 client.get('clientKey'),
                 client.get('sharedSecret'))
 
-            rv = self.app.get('/webpanel/userPanel?issueKey=TEST-1',
+            rv = self.app.get(url,
                               headers={'authorization': 'JWT ' + auth})
             self.assertEquals(200, rv.status_code)
             self.assertIn('<td>Test Person</td>', rv.data)
@@ -89,9 +88,10 @@ class WebTestCase(unittest.TestCase):
             clientKey='test_configurePage',
             publicKey='public123',
             sharedSecret='myscret',)
-        web.set_client(client)
+        with app.app_context():
+            Client.save(client)
         args = {"xdm_e": client['baseUrl']}
-        url = '/module/configurePage?' + urlencode(args)
+        url = '/atlassian_connect/module/configurePage?' + urlencode(args)
 
         args['jwt'] = encode_token(
             'GET',
@@ -99,7 +99,7 @@ class WebTestCase(unittest.TestCase):
             client['clientKey'],
             client['sharedSecret'])
 
-        rv = self.app.get('/module/configurePage?' + urlencode(args))
+        rv = self.app.get('/atlassian_connect/module/configurePage?' + urlencode(args))
         self.assertEquals(200, rv.status_code)
 
     def test_post_configurePage(self):
@@ -108,9 +108,10 @@ class WebTestCase(unittest.TestCase):
             clientKey='test_post_configurePage',
             publicKey='public123',
             sharedSecret='myscret',)
-        web.set_client(client)
+        with app.app_context():
+            Client.save(client)
         args = {"xdm_e": client['baseUrl']}
-        url = '/module/configurePage?' + urlencode(args)
+        url = '/atlassian_connect/module/configurePage?' + urlencode(args)
 
         args['jwt'] = encode_token(
             'POST',
@@ -118,7 +119,7 @@ class WebTestCase(unittest.TestCase):
             client['clientKey'],
             client['sharedSecret'])
 
-        rv = self.app.post('/module/configurePage?' + urlencode(args),
+        rv = self.app.post('/atlassian_connect/module/configurePage?' + urlencode(args),
                            data={
                                "bamboohr_subdomain": "notreal",
                                "bamboohr_api": "ILikeMyRandomAPIKey",
