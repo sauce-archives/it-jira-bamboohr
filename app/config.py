@@ -26,7 +26,6 @@ class Config(object):
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SENTRY_DSN = os.environ.get('SENTRY_DSN')
-    BASE_URL = 'https://no idea yet'
 
 
 class DevelopmentConfig(Config):
