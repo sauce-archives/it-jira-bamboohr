@@ -18,18 +18,33 @@
                     <div class="aui-page-panel-inner">
                         <section class="aui-page-panel-content">
                             <h2>Lets Configure</h2>
-                            <form action="{{url}}" method="post" class="aui">
+                            <form action="{{atlassian_jwt_post_url }}" method="post" class="aui">
                                 <div class="field-group">
                                     <label for="bamboohr_api">API Key <span class="aui-icon icon-required">(required)</span></label>
-                                    <input class="text xlarge-field" type="text" id="bamboohr_api" name="bamboohr_api" placeholder="" required maxlength="40">
+                                    <input class="text xlarge-field" type="text" id="bamboohr_api" name="bamboohr_api" placeholder="" value="{{ bamboohrApi }}" required maxlength="40">
                                     <div class="description">Bamboo HR API Key</div>
                                     <!-- <div class="error">Error message here</div> -->
                                 </div>
                                 <div class="field-group">
                                     <label for="bamboohr_subdomain">Subdomain<span class="aui-icon icon-required">(required)</span></label>
-                                    <input class="text medium-long-field" type="text" id="bamboohr_subdomain" name="bamboohr_subdomain" placeholder="" required>
+                                    <input class="text medium-long-field" type="text" id="bamboohr_subdomain" name="bamboohr_subdomain" value="{{ bamboohrSubdomain }}" placeholder="" required>
                                     <div class="description">&lt;subdomain&gt;.bamboohr.com</div>
                                 </div>
+                                <fieldset class="group">
+                                    <legend><span>
+                                        <label for="projects">Projects<span class="aui-icon icon-required">(required)</span></label>
+                                    </span></legend>
+                                    
+                                    {% for project in projects %}
+                                    <div class="checkbox">
+                                        <input class="checkbox" 
+                                        type="checkbox" name="project_{{ project.id }}" 
+                                        id="project_{{ project.id }}"
+                                        {% if project.isEnabled %}checked{%endif%}>
+                                        <label for="project_{{ project.id }}">{{ project.name }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </fieldset>
                                 <div class="buttons-container">
                                     <div class="buttons">
                                         <input class="button submit" type="submit" value="Save" id="comment-save-button">

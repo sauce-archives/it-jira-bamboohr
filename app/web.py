@@ -3,11 +3,12 @@ import re
 
 import requests
 from atlassian_jwt import encode_token
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, jsonify
 from flask_atlassian_connect import AtlassianConnect
 from PyBambooHR import PyBambooHR
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
+from json import dumps
 
 from flask_sslify import SSLify
 
@@ -21,7 +22,9 @@ except ImportError:
     # python3
     from urllib.parse import urlencode
 
-app = Flask(__name__)
+app = Flask(
+    __name__.split('.').pop(),
+    template_folder=os.path.join(os.path.dirname(__file__), 'templates'))
 app.wsgi_app = ProxyFix(app.wsgi_app)
 sslify = SSLify(app)
 app.config.from_object('app.config.%sConfig' %
@@ -39,8 +42,8 @@ def strip_alpha(s):
 
 def get_bamboohr(client):
     return PyBambooHR(
-        subdomain=client['bamboohrSubdomain'],
-        api_key=client['bamboohrApi']
+        subdomain=client.bamboohrSubdomain,
+        api_key=client.bamboohrApi
     )
 
 
@@ -53,19 +56,21 @@ def installed(client):
              name="Bamboo Employee Information",
              location="atl.jira.view.issue.right.context",
              conditions=[{
-                 "condition": "project_type",
-                 "params": {"projectTypeKey": "service_desk"}
+                 "condition": "entity_property_equal_to",
+                 "params": {
+                     "entity": "project",
+                     "propertyKey": app.config.get('ADDON_KEY'),
+                     "objectName": "isEnabled",
+                     "value": "true"
+                    }
              }])
 def right_context(client):
-    issue_url = '/rest/api/latest/issue/' + request.args.get('issueKey')
-    jwt_authorization = 'JWT %s' % encode_token(
-        'GET', issue_url, app.config.get('ADDON_KEY'), 
-        client.sharedSecret)
-    result = requests.get(
-        client.baseUrl.rstrip('/') + issue_url,
-        headers={'Authorization': jwt_authorization})
-    result.raise_for_status()
-    email = result.json()['fields']['reporter']['emailAddress']
+    issue = request_jira(
+        client,
+        method='GET',
+        url='/rest/api/latest/issue/' + request.args.get('issueKey')
+    ).json()
+    email = issue['fields']['reporter']['emailAddress']
 
     bamboo = get_bamboohr(client)
     employee = next((e for e in bamboo.get_employee_directory()
@@ -84,7 +89,34 @@ def right_context(client):
 
 @ac.module("configurePage", name="Configure")
 def configure_page(client):
+    projects = request_jira(
+        client,
+        method='GET',
+        url='/rest/api/2/project?expand=id,key,name,project.properties'
+    ).json()
     if request.method.lower() == 'post':
+        for project in projects:
+            try:
+                if request.form.get('project_' + project['id']):
+                    request_jira(
+                        client,
+                        method='PUT',
+                        url='/rest/api/2/project/{}/properties/{}'.format(
+                            project['id'],
+                            app.config.get('ADDON_KEY')),
+                        data=dumps({"isEnabled": True})
+                    )
+                else:
+                    request_jira(
+                        client,
+                        method='DELETE',
+                        url='/rest/api/2/project/{}/properties/{}'.format(
+                            project['id'],
+                            app.config.get('ADDON_KEY'))
+                    )
+            except requests.HTTPError:
+                pass
+
         try:
             client.bamboohrApi = request.form['bamboohr_api']
             client.bamboohrSubdomain = request.form['bamboohr_subdomain']
@@ -93,26 +125,61 @@ def configure_page(client):
         except ValueError:
             pass
 
-    args = request.args.copy()
-    del args['jwt']
-
-    signature = encode_token(
-        'POST',
-        request.path + '?' + urlencode(args),
-        client.clientKey,
-        client.sharedSecret)
-    args['jwt'] = signature
+    for project in projects:
+        try:
+            properties = request_jira(
+                client,
+                method='GET',
+                url='/rest/api/2/project/{}/properties/{}'.format(
+                    project['id'],
+                    app.config.get('ADDON_KEY'))
+            )
+            project.update(**properties.json()['value'])
+        except requests.HTTPError:
+            pass
 
     return render_template(
         'configure_page.html',
-        xdm_e=args['xdm_e'],
-        url=request.path + '?' + urlencode(args)
+        xdm_e=request.args['xdm_e'],
+        bamboohrApi=client.bamboohrApi or '',
+        bamboohrSubdomain=client.bamboohrSubdomain or '',
+        projects=projects,
     )
+
+
+def request_jira(client, url, method='GET', **kwargs):
+    jwt_authorization = 'JWT %s' % encode_token(
+        method, url, app.config.get('ADDON_KEY'),
+        client.sharedSecret)
+    result = requests.request(
+        method,
+        client.baseUrl.rstrip('/') + url,
+        headers={
+            "Authorization": jwt_authorization,
+            "Content-Type": "application/json"
+        },
+        **kwargs)
+    try:
+        result.raise_for_status()
+    except requests.HTTPError as e:
+        raise requests.HTTPError(e.response.text, response=e.response)
+    return result
 
 
 @app.route('/healthcheck')
 def healthcheck():
     return 'OK', 200
+
+
+# Move the old path to the new path
+@app.route('/addon/descriptor')
+def move_descriptor():
+    return redirect('/atlassian_connect/descriptor')
+
+
+@app.route('/')
+def index():
+    return 'Welcome to Jira Bamboohr Integration'
 
 
 if __name__ == '__main__':
