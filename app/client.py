@@ -30,6 +30,11 @@ class Client(db.Model):
             yield c.name, getattr(self, c.name)
 
     @staticmethod
+    def all():
+        """Returns an iterator of all clients"""
+        return Client.query.all()
+
+    @staticmethod
     def load(clientKey):
         """Loads a Client from the database"""
         return Client.query.filter_by(clientKey=clientKey).first()

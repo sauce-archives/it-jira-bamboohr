@@ -3,7 +3,7 @@ import re
 
 import requests
 from atlassian_jwt import encode_token
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, redirect
 from flask_atlassian_connect import AtlassianConnect
 from PyBambooHR import PyBambooHR
 from raven.contrib.flask import Sentry

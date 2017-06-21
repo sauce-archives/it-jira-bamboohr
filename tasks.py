@@ -1,8 +1,10 @@
-from invoke import task
+from invoke import task, Collection
+from app.web import ac
 
 
 @task
 def dev(ctx):
+    """Launch Dev Server"""
     ctx.run("python main.py", env={
         "FLASK_DEBUG": "1",
         "PORT": "3000",
@@ -30,3 +32,10 @@ def view(ctx):
 @task
 def test(ctx):
     ctx.run("python -m pytest", pty=True)
+
+
+ns = Collection()
+ns.add_collection(ac.tasks())
+ns.add_task(dev)
+ns.add_task(test)
+ns.add_task(initdb)
