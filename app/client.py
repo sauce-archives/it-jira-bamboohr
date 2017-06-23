@@ -1,4 +1,5 @@
 from .shared import db
+from json import dumps
 
 
 class Client(db.Model):
@@ -10,18 +11,29 @@ class Client(db.Model):
     bamboohrSelectedFields = db.Column(
         'bamboohrSelectedFields',
         db.LargeBinary(),
-        default="""["displayName","jobTitle","department","supervisor","location","workEmail","workPhone","mobilePhone"]"""
+        default=dumps([
+            "displayName", "jobTitle", "department",
+            "supervisor", "location", "workEmail",
+            "workPhone", "mobilePhone"])
     )
 
     def __repr__(self):
-        return 'Client(clientKey="%s", baseUrl="%s", sharedSecret="%s", bamboohrApi="%s", bamboohrSubdomain="%s")' % (
-            self.clientKey, self.baseUrl, self.sharedSecret, self.bamboohrApi, self.bamboohrSubdomain
+        vals = map(
+            lambda x: str(x).replace('client.', ''),
+            self.__table__.columns
         )
+        vals.sort()
+        return 'Client({})'.format(
+            ", ".join(map(lambda x: "%s=%s" % (x, repr(self[x])), vals)))
 
     def __str__(self):
-        return 'Client:\n\tclientKey=%s\n\tbaseUrl=%s\n\tsharedSecret=%s\n\tbamboohrApi=%s\n\tbamboohrSubdomain=%s\n' % (
-            self.clientKey, self.baseUrl, self.sharedSecret, self.bamboohrApi, self.bamboohrSubdomain
+        vals = map(
+            lambda x: str(x).replace('client.', ''),
+            self.__table__.columns
         )
+        vals.sort()
+        return "Client:\n\t{}".format(
+            "\n\t".join(map(lambda x: "%s=%s" % (x, repr(self[x])), vals)))
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
