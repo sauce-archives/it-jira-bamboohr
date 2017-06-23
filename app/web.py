@@ -1,16 +1,16 @@
 import os
 import re
+from json import dumps, loads
 
 import requests
 from atlassian_jwt import encode_token
-from flask import Flask, render_template, request, redirect
+from flask import Flask, redirect, render_template, request
 from flask_atlassian_connect import AtlassianConnect
+from flask_sslify import SSLify
 from PyBambooHR import PyBambooHR
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
-from json import dumps
-
-from flask_sslify import SSLify
+from inflection import humanize, underscore, titleize
 
 from .client import Client
 from .shared import db
@@ -33,6 +33,9 @@ db.init_app(app)
 if os.environ.get('SENTRY_DSN'):
     sentry = Sentry(app, dsn=os.environ['SENTRY_DSN'])
 ac = AtlassianConnect(app, client_class=Client)
+app.template_filter('humanize')(humanize)
+app.template_filter('underscore')(underscore)
+app.template_filter('titleize')(titleize)
 
 
 @app.template_filter('stripalpha')
@@ -45,6 +48,14 @@ def get_bamboohr(client):
         subdomain=client.bamboohrSubdomain,
         api_key=client.bamboohrApi
     )
+
+
+def get_all_bamboohr_fields():
+    fields = PyBambooHR(
+        subdomain="FAKE",
+        api_key="FAKE"
+    ).employee_fields.keys()
+    return filter(lambda x: not x.endswith("Id"), fields)
 
 
 @ac.lifecycle('installed')
@@ -80,10 +91,15 @@ def right_context(client):
 
     employee.update(bamboo.get_employee(int(employee['id'])))
 
+    data = []
+    for field in loads(client.bamboohrSelectedFields):
+        data.append([field, employee[field]])
+
     return render_template(
         'bamboo_user.html',
         xdm_e=request.args.get('xdm_e'),
-        employee=employee
+        employee=employee,
+        data=data
     )
 
 
@@ -97,29 +113,26 @@ def configure_page(client):
     if request.method.lower() == 'post':
         for project in projects:
             try:
+                request_jira_kwargs = dict(
+                    client=client,
+                    method='DELETE',
+                    url='/rest/api/2/project/{}/properties/{}'.format(
+                        project['id'],
+                        app.config.get('ADDON_KEY'))
+                )
+
                 if request.form.get('project_' + project['id']):
-                    request_jira(
-                        client,
-                        method='PUT',
-                        url='/rest/api/2/project/{}/properties/{}'.format(
-                            project['id'],
-                            app.config.get('ADDON_KEY')),
-                        data=dumps({"isEnabled": True})
-                    )
-                else:
-                    request_jira(
-                        client,
-                        method='DELETE',
-                        url='/rest/api/2/project/{}/properties/{}'.format(
-                            project['id'],
-                            app.config.get('ADDON_KEY'))
-                    )
+                    request_jira_kwargs['method'] = 'PUT'
+                    request_jira_kwargs['data'] = dumps({"isEnabled": True})
+                request_jira(**request_jira_kwargs)
             except requests.HTTPError:
                 pass
 
         try:
             client.bamboohrApi = request.form['bamboohr_api']
             client.bamboohrSubdomain = request.form['bamboohr_subdomain']
+            client.bamboohrSelectedFields = request.form[
+                'bamboohr_fields'].replace('bamboo_field_', '')
             Client.save(client)
             return render_template('configure_page_success.html')
         except ValueError:
@@ -138,9 +151,18 @@ def configure_page(client):
         except requests.HTTPError:
             pass
 
+    def flatten(l):
+        return map(lambda x: x[0], l)
+
+    all_fields = get_all_bamboohr_fields()
+    selected_fields = loads(client.bamboohrSelectedFields)
+    fields = [i for i in all_fields
+              if i not in selected_fields]
     return render_template(
         'configure_page.html',
         xdm_e=request.args['xdm_e'],
+        fields=fields,
+        selected_fields=selected_fields,
         bamboohrApi=client.bamboohrApi or '',
         bamboohrSubdomain=client.bamboohrSubdomain or '',
         projects=projects,

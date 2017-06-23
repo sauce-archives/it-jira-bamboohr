@@ -19,14 +19,9 @@
   </head>
   <body>
     <table>
-        <tr> <th>Display Name</th> <td>{{ employee['displayName'] }}</td> </tr>
-        <tr> <th>Title</th> <td>{{ employee['jobTitle'] }}</td> </tr>
-        <tr> <th>Department</th> <td>{{ employee['department'] }}</td> </tr>
-        <tr> <th>Manager</th> <td>{{ employee['supervisor'] }}</td> </tr>
-        <tr> <th>Location</th> <td>{{ employee['location'] }}</td> </tr>
-        <tr> <th>Work Email</th> <td><a href="mailto:{{ employee['workEmail'] | stripalpha }}">{{ employee['workEmail'] }}</a></td> </tr>
-        <tr> <th>Work Phone</th> <td><a href="tel:{{ employee['workPhone'] | stripalpha }}">{{ employee['workPhone'] }}</a></td> </tr>
-        <tr> <th>Mobile Phone</th> <td><a href="tel:{{ employee['mobilePhone'] | stripalpha }}">{{ employee['mobilePhone'] }}</a></td> </tr>
+      {% for d in data %}
+        <tr> <th>{{ d[0] | titleize }}</th> <td>{{ d[1] }}</td> </tr>
+      {% endfor %}
     </table>
     <script type="text/javascript" src="{{ xdm_e }}/atlassian-connect/all.js"></script>
   </body>

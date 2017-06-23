@@ -1,0 +1,234 @@
+{
+    "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+    "id": "10012",
+    "self": "https://gavindev.atlassian.net/rest/api/latest/issue/10012",
+    "key": "GAV-13",
+    "fields": {
+        "issuetype": {
+            "self": "https://gavindev.atlassian.net/rest/api/2/issuetype/10102",
+            "id": "10102",
+            "description": "A problem which impairs or prevents the functions of the product.",
+            "iconUrl": "https://gavindev.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10303&avatarType=issuetype",
+            "name": "Bug",
+            "subtask": false,
+            "avatarId": 10303
+        },
+        "timespent": null,
+        "project": {
+            "self": "https://gavindev.atlassian.net/rest/api/2/project/10000",
+            "id": "10000",
+            "key": "GAV",
+            "name": "gav",
+            "avatarUrls": {
+                "48x48": "https://gavindev.atlassian.net/secure/projectavatar?avatarId=10324",
+                "24x24": "https://gavindev.atlassian.net/secure/projectavatar?size=small&avatarId=10324",
+                "16x16": "https://gavindev.atlassian.net/secure/projectavatar?size=xsmall&avatarId=10324",
+                "32x32": "https://gavindev.atlassian.net/secure/projectavatar?size=medium&avatarId=10324"
+            }
+        },
+        "fixVersions": [
+            {
+                "self": "https://gavindev.atlassian.net/rest/api/2/version/10001",
+                "id": "10001",
+                "name": "Version 2.0",
+                "archived": false,
+                "released": false,
+                "releaseDate": "2016-06-19"
+            }
+        ],
+        "aggregatetimespent": null,
+        "resolution": null,
+        "customfield_10302": null,
+        "customfield_10303": null,
+        "resolutiondate": null,
+        "workratio": -1,
+        "watches": {
+            "self": "https://gavindev.atlassian.net/rest/api/2/issue/GAV-13/watchers",
+            "watchCount": 0,
+            "isWatching": false
+        },
+        "lastViewed": null,
+        "created": "2016-06-05T09:17:06.088-0700",
+        "customfield_10020": [
+            "com.atlassian.greenhopper.service.sprint.Sprint@121da[id=1,rapidViewId=1,state=ACTIVE,name=Sample Sprint 2,goal=<null>,startDate=2016-06-05T09:17:08.171-07:00,endDate=2016-06-19T09:37:08.171-07:00,completeDate=<null>,sequence=1]"
+        ],
+        "customfield_10021": null,
+        "priority": {
+            "self": "https://gavindev.atlassian.net/rest/api/2/priority/3",
+            "iconUrl": "https://gavindev.atlassian.net/images/icons/priorities/medium.svg",
+            "name": "Medium",
+            "id": "3"
+        },
+        "customfield_10300": null,
+        "customfield_10026": null,
+        "labels": [],
+        "customfield_10301": "{}",
+        "customfield_10016": [],
+        "customfield_10017": null,
+        "customfield_10018": null,
+        "customfield_10019": "0|i0002n:",
+        "aggregatetimeoriginalestimate": null,
+        "timeestimate": null,
+        "versions": [],
+        "issuelinks": [],
+        "assignee": {
+            "self": "https://gavindev.atlassian.net/rest/api/2/user?username=admin",
+            "name": "admin",
+            "key": "admin",
+            "accountId": "557058:ae6eb1e1-51c7-49f4-ac84-0ee1057b5458",
+            "emailAddress": "gavin@saucelabs.com",
+            "avatarUrls": {
+                "48x48": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=48&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D48%26noRedirect%3Dtrue",
+                "24x24": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=24&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D24%26noRedirect%3Dtrue",
+                "16x16": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=16&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D16%26noRedirect%3Dtrue",
+                "32x32": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=32&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D32%26noRedirect%3Dtrue"
+            },
+            "displayName": "admin",
+            "active": true,
+            "timeZone": "America/Los_Angeles"
+        },
+        "updated": "2016-06-05T09:17:06.088-0700",
+        "status": {
+            "self": "https://gavindev.atlassian.net/rest/api/2/status/10000",
+            "description": "",
+            "iconUrl": "https://gavindev.atlassian.net/",
+            "name": "To Do",
+            "id": "10000",
+            "statusCategory": {
+                "self": "https://gavindev.atlassian.net/rest/api/2/statuscategory/2",
+                "id": 2,
+                "key": "new",
+                "colorName": "blue-gray",
+                "name": "To Do"
+            }
+        },
+        "components": [],
+        "timeoriginalestimate": null,
+        "description": "*Editing using the Detail View*\n\nMany of the fields in the detail view can be inline edited by simply clicking on them. \n\nFor other fields you can open Quick Edit, select \"Edit\" from the cog drop-down.",
+        "customfield_10010": null,
+        "customfield_10011": null,
+        "customfield_10012": null,
+        "customfield_10013": null,
+        "timetracking": {},
+        "customfield_10015": null,
+        "customfield_10401": null,
+        "customfield_10005": null,
+        "customfield_10402": null,
+        "customfield_10006": null,
+        "customfield_10007": null,
+        "customfield_10403": null,
+        "customfield_10008": null,
+        "customfield_10404": null,
+        "aggregatetimeestimate": null,
+        "customfield_10405": null,
+        "attachment": [],
+        "customfield_10009": null,
+        "summary": "As a developer, I can update details on an item using the Detail View >> Click the \"GAV-13\" link at the top of this card to open the detail view",
+        "creator": {
+            "self": "https://gavindev.atlassian.net/rest/api/2/user?username=admin",
+            "name": "admin",
+            "key": "admin",
+            "accountId": "557058:ae6eb1e1-51c7-49f4-ac84-0ee1057b5458",
+            "emailAddress": "gavin@saucelabs.com",
+            "avatarUrls": {
+                "48x48": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=48&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D48%26noRedirect%3Dtrue",
+                "24x24": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=24&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D24%26noRedirect%3Dtrue",
+                "16x16": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=16&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D16%26noRedirect%3Dtrue",
+                "32x32": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=32&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D32%26noRedirect%3Dtrue"
+            },
+            "displayName": "admin",
+            "active": true,
+            "timeZone": "America/Los_Angeles"
+        },
+        "subtasks": [],
+        "reporter": {
+            "self": "https://gavindev.atlassian.net/rest/api/2/user?username=admin",
+            "name": "admin",
+            "key": "admin",
+            "accountId": "557058:ae6eb1e1-51c7-49f4-ac84-0ee1057b5458",
+            "emailAddress": "gavin@saucelabs.com",
+            "avatarUrls": {
+                "48x48": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=48&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D48%26noRedirect%3Dtrue",
+                "24x24": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=24&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D24%26noRedirect%3Dtrue",
+                "16x16": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=16&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D16%26noRedirect%3Dtrue",
+                "32x32": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=32&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D32%26noRedirect%3Dtrue"
+            },
+            "displayName": "admin",
+            "active": true,
+            "timeZone": "America/Los_Angeles"
+        },
+        "customfield_10000": null,
+        "aggregateprogress": {
+            "progress": 0,
+            "total": 0
+        },
+        "customfield_10001": null,
+        "customfield_10200": null,
+        "customfield_10201": null,
+        "customfield_10004": null,
+        "customfield_10400": null,
+        "environment": null,
+        "duedate": null,
+        "progress": {
+            "progress": 0,
+            "total": 0
+        },
+        "comment": {
+            "comments": [
+                {
+                    "self": "https://gavindev.atlassian.net/rest/api/2/issue/10012/comment/10004",
+                    "id": "10004",
+                    "author": {
+                        "self": "https://gavindev.atlassian.net/rest/api/2/user?username=admin",
+                        "name": "admin",
+                        "key": "admin",
+                        "accountId": "557058:ae6eb1e1-51c7-49f4-ac84-0ee1057b5458",
+                        "emailAddress": "gavin@saucelabs.com",
+                        "avatarUrls": {
+                            "48x48": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=48&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D48%26noRedirect%3Dtrue",
+                            "24x24": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=24&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D24%26noRedirect%3Dtrue",
+                            "16x16": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=16&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D16%26noRedirect%3Dtrue",
+                            "32x32": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=32&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D32%26noRedirect%3Dtrue"
+                        },
+                        "displayName": "admin",
+                        "active": true,
+                        "timeZone": "America/Los_Angeles"
+                    },
+                    "body": "Joined Sample Sprint 2 7 days 9 hours 10 minutes ago",
+                    "updateAuthor": {
+                        "self": "https://gavindev.atlassian.net/rest/api/2/user?username=admin",
+                        "name": "admin",
+                        "key": "admin",
+                        "accountId": "557058:ae6eb1e1-51c7-49f4-ac84-0ee1057b5458",
+                        "emailAddress": "gavin@saucelabs.com",
+                        "avatarUrls": {
+                            "48x48": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=48&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D48%26noRedirect%3Dtrue",
+                            "24x24": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=24&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D24%26noRedirect%3Dtrue",
+                            "16x16": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=16&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D16%26noRedirect%3Dtrue",
+                            "32x32": "https://avatar-cdn.atlassian.com/562f8eec7841ccd25bc614dbba801b8f?s=32&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2F562f8eec7841ccd25bc614dbba801b8f%3Fd%3Dmm%26s%3D32%26noRedirect%3Dtrue"
+                        },
+                        "displayName": "admin",
+                        "active": true,
+                        "timeZone": "America/Los_Angeles"
+                    },
+                    "created": "2016-06-05T09:17:06.088-0700",
+                    "updated": "2016-06-05T09:17:06.088-0700"
+                }
+            ],
+            "maxResults": 1,
+            "total": 1,
+            "startAt": 0
+        },
+        "votes": {
+            "self": "https://gavindev.atlassian.net/rest/api/2/issue/GAV-13/votes",
+            "votes": 0,
+            "hasVoted": false
+        },
+        "worklog": {
+            "startAt": 0,
+            "maxResults": 20,
+            "total": 0,
+            "worklogs": []
+        }
+    }
+}

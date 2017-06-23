@@ -7,6 +7,11 @@ class Client(db.Model):
     sharedSecret = db.Column(db.String(100))
     bamboohrApi = db.Column(db.String(40))
     bamboohrSubdomain = db.Column(db.String(40))
+    bamboohrSelectedFields = db.Column(
+        'bamboohrSelectedFields',
+        db.LargeBinary(),
+        default="""["displayName","jobTitle","department","supervisor","location","workEmail","workPhone","mobilePhone"]"""
+    )
 
     def __repr__(self):
         return 'Client(clientKey="%s", baseUrl="%s", sharedSecret="%s", bamboohrApi="%s", bamboohrSubdomain="%s")' % (

@@ -1,0 +1,44 @@
+[
+    {
+        "expand": "description,lead,issueTypes,url,projectKeys",
+        "self": "https://gavindev.atlassian.net/rest/api/2/project/10000",
+        "id": "10000",
+        "key": "GAV",
+        "name": "gav",
+        "avatarUrls": {
+            "48x48": "https://gavindev.atlassian.net/secure/projectavatar?avatarId=10324",
+            "24x24": "https://gavindev.atlassian.net/secure/projectavatar?size=small&avatarId=10324",
+            "16x16": "https://gavindev.atlassian.net/secure/projectavatar?size=xsmall&avatarId=10324",
+            "32x32": "https://gavindev.atlassian.net/secure/projectavatar?size=medium&avatarId=10324"
+        },
+        "projectTypeKey": "software"
+    },
+    {
+        "expand": "description,lead,issueTypes,url,projectKeys",
+        "self": "https://gavindev.atlassian.net/rest/api/2/project/10200",
+        "id": "10200",
+        "key": "IM",
+        "name": "IM",
+        "avatarUrls": {
+            "48x48": "https://gavindev.atlassian.net/secure/projectavatar?avatarId=10324",
+            "24x24": "https://gavindev.atlassian.net/secure/projectavatar?size=small&avatarId=10324",
+            "16x16": "https://gavindev.atlassian.net/secure/projectavatar?size=xsmall&avatarId=10324",
+            "32x32": "https://gavindev.atlassian.net/secure/projectavatar?size=medium&avatarId=10324"
+        },
+        "projectTypeKey": "software"
+    },
+    {
+        "expand": "description,lead,issueTypes,url,projectKeys",
+        "self": "https://gavindev.atlassian.net/rest/api/2/project/10100",
+        "id": "10100",
+        "key": "TES",
+        "name": "TestDesk",
+        "avatarUrls": {
+            "48x48": "https://gavindev.atlassian.net/secure/projectavatar?avatarId=10324",
+            "24x24": "https://gavindev.atlassian.net/secure/projectavatar?size=small&avatarId=10324",
+            "16x16": "https://gavindev.atlassian.net/secure/projectavatar?size=xsmall&avatarId=10324",
+            "32x32": "https://gavindev.atlassian.net/secure/projectavatar?size=medium&avatarId=10324"
+        },
+        "projectTypeKey": "service_desk"
+    }
+]

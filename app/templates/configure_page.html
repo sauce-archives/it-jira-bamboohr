@@ -4,11 +4,24 @@
         <script src="{{ xdm_e }}/atlassian-connect/all.js"></script>
         <link rel="stylesheet" href="{{ xdm_e }}/atlassian-connect/all.css">
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/css/aui.css" media="all">
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
         <!--[if lt IE 9]><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/css/aui-ie.css" media="all"><![endif]-->
         <!--[if IE 9]><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/css/aui-ie9.css" media="all"><![endif]-->
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/js/aui.js"></script>
         <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/aui/5.2/js/aui-ie.js"></script><![endif]-->
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+        <script src="https://cdn.rawgit.com/vafour/select2-sortable/master/select2.sortable.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <style>
+            #sortable, #disabledList { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+            #sortable li, #disabledList li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 0.5em; font-size: 1.4em; height: 18px; }
+            #sortable li span, #disabledList li span { position: absolute; margin-left: -1.3em; }
+        </style>
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
     </head>
 
     <bodyy class="aui-page-focused">
@@ -45,6 +58,29 @@
                                     </div>
                                     {% endfor %}
                                 </fieldset>
+                                <div class="field-group">
+                                    <label for="bamboohr_fields">Display Fields<span class="aui-icon icon-required">(required)</span></label>
+                                    <input type="hidden" id="bamboohr_fields" name="bamboohr_fields" value='{{ selected_fields | tojson | escape }}' />
+
+                                    <h2>Displayed Fields</h2>
+                                    <ul id="sortable">
+                                        {% for field in selected_fields %}
+                                        <li class="ui-state-default" id="bamboo_field_{{field}}">
+                                            <button><i class="fa fa-minus" aria-hidden="true"></i></button>
+                                            {{ field | titleize }}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <h2>Unused Fields</h2>
+                                    <ul id="disabledList">
+                                        {% for field in fields %}
+                                        <li class="ui-state-default" id="bamboo_field_{{field}}">
+                                            <button class="add-button"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                                            {{ field | titleize}}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                                 <div class="buttons-container">
                                     <div class="buttons">
                                         <input class="button submit" type="submit" value="Save" id="comment-save-button">
@@ -56,5 +92,33 @@
                 </div>
             </section>
         </div>
+        <script type="text/javascript">
+            $(function() {
+                var outputSortable = function() {
+                     $("#bamboohr_fields").val(JSON.stringify($( "#sortable" ).sortable( "toArray" )));
+                }
+                $( "#sortable" ).sortable({
+                    update: outputSortable
+                });
+                $( "#sortable" ).disableSelection();
+                $( '#disabledList' ).on('click', 'button', function(e) {
+                    e.preventDefault();
+                    var li = $(this).parent('li');
+                    var field = li.data('field')
+                    $('#sortable').append(li);
+                    li.find('.fa-plus').removeClass('fa-plus').addClass('fa-minus')
+                    $( "#sortable" ).sortable("refresh");
+                    outputSortable();
+                });
+                $( '#sortable' ).on('click', 'button', function(e) {
+                    e.preventDefault();
+                    var li = $(this).parent('li');
+                    $('#disabledList').append(li);
+                    li.find('.fa-minus').removeClass('fa-minus').addClass('fa-plus')
+                    $( "#sortable" ).sortable("refresh");
+                    outputSortable();
+                });
+            });
+        </script>
     </body>
 </html>
