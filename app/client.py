@@ -1,4 +1,5 @@
 from .shared import db
+from sqlalchemy.ext.hybrid import hybrid_property
 from json import dumps
 
 
@@ -8,7 +9,7 @@ class Client(db.Model):
     sharedSecret = db.Column(db.String(100))
     bamboohrApi = db.Column(db.String(40))
     bamboohrSubdomain = db.Column(db.String(40))
-    bamboohrSelectedFields = db.Column(
+    _bamboohrSelectedFields = db.Column(
         'bamboohrSelectedFields',
         db.LargeBinary(),
         default=dumps([
@@ -16,6 +17,19 @@ class Client(db.Model):
             "supervisor", "location", "workEmail",
             "workPhone", "mobilePhone"])
     )
+
+    @hybrid_property
+    def bamboohrSelectedFields(self):
+        return self._bamboohrSelectedFields or dumps([
+            "displayName", "jobTitle", "department",
+            "supervisor", "location", "workEmail",
+            "workPhone", "mobilePhone"])
+
+    @bamboohrSelectedFields.setter
+    def bamboohrSelectedFields(self, value):
+        if value is None:
+            raise Exception("Something is setting this to none")
+        self._bamboohrSelectedFields = value
 
     def __repr__(self):
         vals = map(
