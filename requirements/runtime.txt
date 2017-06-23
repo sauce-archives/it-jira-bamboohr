@@ -7,3 +7,6 @@ requests_jwt==0.4
 Flask-AtlassianConnect
 raven[flask]==6.1.0
 inflection==0.3.1
+
+gunicorn==19.7.1
+psycopg2==2.7.1
