@@ -11,7 +11,7 @@ class Client(db.Model):
     bamboohrSubdomain = db.Column(db.String(40))
     _bamboohrSelectedFields = db.Column(
         'bamboohrSelectedFields',
-        db.LargeBinary(),
+        db.Text(),
         default=dumps([
             "displayName", "jobTitle", "department",
             "supervisor", "location", "workEmail",
