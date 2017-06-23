@@ -20,6 +20,14 @@ def initdb(ctx):
 
 
 @task
+def resetdb(ctx):
+    from app import app, db
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+
+
+@task
 def view(ctx):
     from json import dumps
     from app import app, Client
@@ -38,4 +46,5 @@ ns = Collection()
 ns.add_collection(ac.tasks())
 ns.add_task(dev)
 ns.add_task(test)
+ns.add_task(resetdb)
 ns.add_task(initdb)
