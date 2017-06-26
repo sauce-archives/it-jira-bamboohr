@@ -1,0 +1,13 @@
+{
+  "name": "Jira BambooHR",
+  "description": "A simple plugin to show bamboohr information in jira",
+  "website": "https://github.com/saucelabs/it-jira-bamboohr",
+  "success_url": "/atlassian_connect/descriptor",
+  "addons": ["heroku-postgresql:hobby-dev"],
+  "env": {
+    "FLASK_ENV": "production",
+   },
+  "scripts": {
+    "postdeploy": "invoke initdb"
+  }
+} 
