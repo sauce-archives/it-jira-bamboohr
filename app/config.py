@@ -13,8 +13,6 @@ class Config(object):
     """
     ADDON_VENDOR_URL = 'https://saucelabs.com'
     ADDON_VENDOR_NAME = 'Sauce Labs'
-    BASE_URL = os.environ.get('AC_BASE_URL')
-
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'SQLALCHEMY_DATABASE_URI',
         'sqlite:////tmp/%s.db' % ADDON_KEY)

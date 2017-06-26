@@ -8,7 +8,6 @@ def dev(ctx):
     ctx.run("python main.py", env={
         "FLASK_DEBUG": "1",
         "PORT": "3000",
-        "AC_BASE_URL": "https://dev.gavinmogan.com"
     }, replace_env=False)
 
 
