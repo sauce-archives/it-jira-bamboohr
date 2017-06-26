@@ -1,5 +1,7 @@
 # Jira BambooHR Integrations
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/saucelabs/it-jira-bamboohr)
+
 This project is a simple jira integration that adds a BambooHR webpanel that will show you some information about the reporter pulled from bamboohr
 
 ## Config Vars
