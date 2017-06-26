@@ -4,7 +4,7 @@ Flask-SQLAlchemy==2.2
 Flask-SSLify==0.1.5
 jira==1.0.10
 requests_jwt==0.4
-Flask-AtlassianConnect
+Flask-AtlassianConnect==0.0.2
 raven[flask]==6.1.0
 inflection==0.3.1
 
