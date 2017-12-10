@@ -44,14 +44,14 @@ def strip_alpha(s):
 
 
 def get_bamboohr(client):
-    return PyBambooHR(
+    return PyBambooHR.PyBambooHR(
         subdomain=client.bamboohrSubdomain,
         api_key=client.bamboohrApi
     )
 
 
 def get_all_bamboohr_fields():
-    fields = PyBambooHR(
+    fields = PyBambooHR.PyBambooHR(
         subdomain="FAKE",
         api_key="FAKE"
     ).employee_fields.keys()

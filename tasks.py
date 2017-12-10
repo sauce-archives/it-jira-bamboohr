@@ -1,3 +1,4 @@
+from __future__ import print_function
 from invoke import task, Collection
 from app.web import ac
 
@@ -31,9 +32,9 @@ def view(ctx):
     from json import dumps
     from app import app, Client
     with app.app_context():
-        print dumps([
+        print(dumps([
             dict(c) for c in Client.query.all()
-        ])
+        ]))
 
 
 @task

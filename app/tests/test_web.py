@@ -81,8 +81,8 @@ class WebTestCase(unittest.TestCase):
 
         rv = self.app.get(url, headers={'authorization': 'JWT ' + auth})
         self.assertEquals(200, rv.status_code)
-        self.assertIn('<td>Test Person</td>', rv.data)
-        self.assertIn('<th>Display Name</th>', rv.data)
+        self.assertIn('<td>Test Person</td>'.encode(), rv.data)
+        self.assertIn('<th>Display Name</th>'.encode(), rv.data)
 
     @requests_mock.mock()
     def test_configurePage(self, m):

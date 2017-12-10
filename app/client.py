@@ -32,22 +32,22 @@ class Client(db.Model):
         self._bamboohrSelectedFields = value
 
     def __repr__(self):
-        vals = map(
+        vals = list(map(
             lambda x: str(x).replace('client.', ''),
             self.__table__.columns
-        )
+        ))
         vals.sort()
         return 'Client({})'.format(
-            ", ".join(map(lambda x: "%s=%s" % (x, repr(self[x])), vals)))
+            ", ".join(list(map(lambda x: "%s=%s" % (x, repr(self[x])), vals))))
 
     def __str__(self):
-        vals = map(
+        vals = list(map(
             lambda x: str(x).replace('client.', ''),
             self.__table__.columns
-        )
+        ))
         vals.sort()
         return "Client:\n\t{}".format(
-            "\n\t".join(map(lambda x: "%s=%s" % (x, repr(self[x])), vals)))
+            "\n\t".join(list(map(lambda x: "%s=%s" % (x, repr(self[x])), vals))))
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
